@@ -1,0 +1,27 @@
+{
+  "name": "spanners",
+  "version": "0.1.0",
+  "author": "devmikey <devmikey.js@gmail.com>",
+  "description": "The Management console for jigsaw",
+  "contributors": [],
+  "main": "./scripts/jigsaw.js",
+  "keywords": [
+    "digital signature",
+    "itk",
+    "interopeability toolkit",
+    "clinical correspondence",
+    "mini spine services",
+    "distribution envelope",
+    "soap"
+  ],
+  "dependencies": {
+    "connect": ">= 1.8.6",
+    "express": ">= 2.5.9"
+  },
+  "devDependencies": [],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 0.6"
+  },
+  "private": true
+}

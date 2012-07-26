@@ -36,11 +36,11 @@ app.configure('production', function() {
 * dynamic route loaders
 **/
 	// get jigsaw service information
-	app.get('/jigsaw/jigsawservice', function(req, res) {
+	app.get('/jigsaw/services', function(req, res) {
 		var options = {
 		  host: 'localhost',
 		  port: 3000,
-		  path: '/jigsaw/jigsawservice',
+		  path: '/jigsaw/services',
 		  method: 'GET'
 		};
 
@@ -66,6 +66,66 @@ app.configure('production', function() {
 
 	});
 
+	app.get('/jigsaw/disable/*', function(req, res) {
+		console.log("disabling service : " + req.params[0]);
+		var options = {
+		  host: 'localhost',
+		  port: 3000,
+		  path: '/jigsaw/disable/' + req.params[0],
+		  method: 'GET'
+		};
+
+		var jigrequest = http.request(options, function(jigresponse) {
+		  var data = "";
+		  jigresponse.on('data', function (chunk) {
+			data = data + chunk;
+		  });
+		  
+		  jigresponse.on('end', function (chunk) {
+			res.writeHead(200, { 'Content-Type': 'application/json' });
+			res.write(data);
+			res.end();
+		  });
+		  
+		});
+
+		jigrequest.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		jigrequest.end();
+	});
+	
+	app.get('/jigsaw/enable/*', function(req, res) {
+		console.log("enabling service : " + req.params[0]);
+		var options = {
+		  host: 'localhost',
+		  port: 3000,
+		  path: '/jigsaw/enable/' + req.params[0],
+		  method: 'GET'
+		};
+
+		var jigrequest = http.request(options, function(jigresponse) {
+		  var data = "";
+		  jigresponse.on('data', function (chunk) {
+			data = data + chunk;
+		  });
+		  
+		  jigresponse.on('end', function (chunk) {
+			res.writeHead(200, { 'Content-Type': 'application/json' });
+			res.write(data);
+			res.end();
+		  });
+		  
+		});
+
+		jigrequest.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		jigrequest.end();
+	});
+	
 /* global routes - these should be last */
 app.get('/403', function(req, res) {
 	throw new Error('This is a 403 Error');

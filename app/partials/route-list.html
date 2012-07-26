@@ -2,14 +2,8 @@
   <div class="row-fluid">
 	<ul class="menu">
         <li>
-          <a href="#/menu/deploy">Deploy</a>
+          <a ng-click="toggleDisplay()">Add Route</a>
         </li>
-        <li>
-          <a href="#/menu/manage">Manage</a>
-        </li>
-        <li>
-          <a href="#/menu/report">Report</a>
-        </li>		
 	</ul>
   </div>
   <div class="row-fluid">
@@ -22,21 +16,39 @@
         <option value="serviceStatus">Status</option>
         <option value="service">Service</option>
       </select>
-
     </div>
+	
     <div class="span10">
       <!--Body content-->
-   
+
       <ul class="routes">
         <li ng-repeat="route in routes | filter:query | orderBy:orderProp" class="thumbnail">
 			<img ng-src="img/management/{{route.serviceStatus}}.jpg" ng-click="toogleService(route)" class="serviceToggle">
-			<a href="#/routes/{{route.id}}">{{route.service}}</a>  
+			<a href="#/routes/disable{{route.route}}">{{route.service}}</a>  
 			<p>Jigsaw Service "{{route.service}}" accessed on {{route.route}}</p>
 			<p>Description: {{route.description}}</p>
 			<p>Status: {{route.serviceStatus}}</p>
         </li>
       </ul>
-
     </div>
+
+	<dialog errmsg="please enter valid route first" ng-show="true" url="partials/components/addRoute.html" controller="addRouteCtrl" title="Add New Route" id="addRoute">
+		<form>
+			<span>Route:</span></br> 
+			<input name="route" type="text" ng-model="route.route" /></br>
+			<span>Service:</span></br>
+			<input name="service" type="text" ng-model="route.service" /></br>
+			<span>description:</span></br>
+			<textarea ng-model="route.description"></textarea></br>
+			<span>Invocation Style :</span>
+			<input type="radio" ng-model="route.invocationstyle" value="sync" />sync
+			<input type="radio" ng-model="route.invocationstyle" value="async" />async
+			</br></br>
+			<button class="minimal" ng-click="cancel()">Cancel</button>
+			<button class="minimal" ng-click="save(route)">Save</button>
+		</form>
+		<p>{{message}}</p>
+	</dialog>
+	
   </div>
 </div>

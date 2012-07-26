@@ -1,15 +1,14 @@
 /* app css stylesheet */
-
+/* #64721C #9ADF1A #BFCA67 #F4F6F4 #9EA192 */
+/* #271D16 #7E7469 #855B13 #F9FBFB #9FA096 */
 body {
-  padding-top: 20px;
+  margin: 0;
+  padding:0;
 }
 
 .menu li {
   list-style: none;
   display:inline;
-  float: left;
-  margin: -1em 1em 1.5em 0em;
-  padding-bottom: 1em;
 }
 
 .routes {
@@ -27,6 +26,72 @@ body {
   clear: both;
   height: 7em;
   padding-top: 15px;
+}
+
+.dialog {
+
+	background: white;
+   
+    border-width: 1px;
+    color: black;
+    padding: 5px 10px;
+    border-color: white #F4F6F4 #F4F6F4 #F4F6F4;
+    border-style: solid;
+    border-radius: 8px;
+    box-shadow: 0 1px 7px #080808;
+
+
+	position:absolute;
+	left:20px;
+	top:40px;
+	z-index:10;
+	width: 260px;
+	height: 340px;
+	overflow: auto;
+}
+
+.dialog h4 {
+
+}
+
+.dialog form {
+	padding: 20px;
+}
+
+.shadow {
+  -moz-box-shadow:    3px 3px 5px 6px #ccc;
+  -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+  box-shadow:         3px 3px 5px 6px #ccc;
+}
+
+/* Blue Minimal */
+button.minimal {
+	float:right;
+	margin-right: 10px;
+	width: 75px;
+	
+    background: #64721C;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#BFCA67), to(#64721C));
+    background-image: -webkit-linear-gradient(top, #BFCA67, #64721C);
+    background-image:    -moz-linear-gradient(top, #BFCA67, #64721C);
+    background-image:     -ms-linear-gradient(top, #BFCA67, #64721C);
+    background-image:      -o-linear-gradient(top, #BFCA67, #64721C);
+    border-width: 1px;
+    color: white;
+    padding: 5px 10px;
+    border-color: white #BFCA67 #2b4763 #BFCA67;
+    border-style: solid;
+    border-radius: 5px;
+    box-shadow: 0 1px 7px #080808;
+}
+button.minimal:hover {
+    box-shadow: 0 1px 5px #222;
+}
+button.minimal:active {
+    box-shadow: inset 0 1px 7px #565656;
+    border-width: 1px;
+    border-color: white #a1c1e6 black #a1c1e6;
+    border-style: solid;
 }
 
 h1 {

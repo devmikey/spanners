@@ -44,66 +44,12 @@ function RouteListCtrl($scope, $http, Route) {
 			});
 	 }
   };
-  
 }
 
-function addRouteCtrl($scope, $element, $attrs, $http) {
-
-	var isRouteValid = function(route) {
-		if (empty(route)) {
-			throw new Error("The route details can't be empty");
-		}
-		if (empty(route.route)) {
-			throw new Error("The route must be entered");
-		}
-		if (empty(route.service)) {
-			throw new Error("The service must be entered");
-		}
-		if (empty(route.description)) {
-			throw new Error("The description must be entered");
-		}
-		if (empty(route.invocationstyle)) {
-			throw new Error("The invocation style must be selected");
-		}
-		return true;
-	}
-
-	//set the dialog titlebar
-	$scope.myTitle = $attrs.title;
-	$scope.isVisible = false;
-	$scope.cancel = function (){
-		$scope.toggleDisplay();
-	}	
-	
-	$scope.save = function (route){
-		// need to use a common validation library between server and client
-		try {
-			if (isRouteValid(route)) {
-				// save and then close dialog
-				$scope.toggleDisplay();
-				return;
-			}
-		}
-		catch(err){
-			$scope.message = err.message;
-			console.log(err);
-		}
-		
-	}
-	
-	$scope.toggleDisplay = function(){
-		$scope.isVisible = !$scope.isVisible;
-	}
-	
-	// make the dialog dragabble
-	$(function() {
-		$('#'+$attrs.id+' .draggable').draggable();
-	});
-}
-
+// should go into lib rather then controller
 function empty(e) {
 		return (!e || 0 === e.length);
-    }
+}
 
 function emptyController($scope) {
 }

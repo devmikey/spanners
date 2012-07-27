@@ -5,6 +5,19 @@
 function RouteListCtrl($scope, $http, Route) {
   $scope.routes = Route.query();
   $scope.orderProp = 'service';
+  $scope.deleteService = function(route) {
+		$http({
+				method : "GET",
+				url : "/jigsaw/services/delete/" + route.route
+			}).
+			success(function (data, status) {
+				$scope.routes = data;
+			}).
+			error(function (data, status) {
+				console.log("failed - deleting service - " +data);
+				console.log(status);
+			});
+  }
   
   $scope.toogleService = function(route) {
      if (route.serviceStatus == 'stopped') {
@@ -16,8 +29,6 @@ function RouteListCtrl($scope, $http, Route) {
 				url : "/jigsaw/enable/" + route.route
 			}).
 			success(function (data, status) {
-				console.log(data);
-				console.log(status);
 				$scope.routes = data;
 			}).
 			error(function (data, status) {
@@ -34,8 +45,6 @@ function RouteListCtrl($scope, $http, Route) {
 				url : "/jigsaw/disable/" + route.route
 			}).
 			success(function (data, status) {
-				console.log("success route disabled - " +data);
-				console.log(status);
 				$scope.routes = data;
 			}).
 			error(function (data, status) {

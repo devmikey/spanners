@@ -4,9 +4,10 @@
 * include any modules you will use through out the file
 **/
 
-var express = require('express')
-  , connect = require('connect');
+var express = require('express');
+var connect = require('connect');
 var http = require('http');
+var datastore = require('./lib/datastore.js');
 
 var app = module.exports = express.createServer();
 
@@ -37,93 +38,100 @@ app.configure('production', function() {
 **/
 	// get jigsaw service information
 	app.get('/jigsaw/services', function(req, res) {
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/services',
-		  method: 'GET'
-		};
-
-		var jigrequest = http.request(options, function(jigresponse) {
-		  var data = "";
-		  jigresponse.on('data', function (chunk) {
-			data = data + chunk;
-		  });
-		  
-		  jigresponse.on('end', function (chunk) {
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.write(data);
-			res.end();
-		  });
-		  
+		// load from file instead of jigsaw
+		datastore.loadSettings(function(err, data) {
+			if (err != undefined ) {
+				res.writeHead(500, { 'Content-Type': 'application/json' });
+				res.write(err);
+				res.end();
+			}
+			else {
+				res.writeHead(200, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(data));
+				res.end();		
+			}
+			
 		});
-
-		jigrequest.on('error', function(e) {
-		  console.log('problem with request: ' + e.message);
-		});
-
-		jigrequest.end();
 
 	});
 
-	app.get('/jigsaw/disable/*', function(req, res) {
-		console.log("disabling service : " + req.params[0]);
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/disable/' + req.params[0],
-		  method: 'GET'
-		};
-
-		var jigrequest = http.request(options, function(jigresponse) {
-		  var data = "";
-		  jigresponse.on('data', function (chunk) {
+	app.post('/jigsaw/services/add', function(req, res) {
+		console.log("new service added");
+		// need to validate first
+		// post onto the appropriate jigsaw server
+		// return a valid response
+		var data = "";
+		
+		req.on('data', function (chunk) {
 			data = data + chunk;
-		  });
-		  
-		  jigresponse.on('end', function (chunk) {
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.write(data);
-			res.end();
-		  });
-		  
 		});
 
-		jigrequest.on('error', function(e) {
-		  console.log('problem with request: ' + e.message);
+		req.on('end', function (chunk) {
+			// add the settings
+			datastore.addRoute(data, function(err, data) {
+				if (err != undefined ) {
+					res.writeHead(500, { 'Content-Type': 'application/json' });
+					res.write(JSON.stringify(err));
+					res.end();
+				}
+				else {
+					res.writeHead(200, { 'Content-Type': 'application/json' });
+					res.write(JSON.stringify(data));
+					res.end();		
+				}	
+			});
+		});
+	});
+	
+	app.get('/jigsaw/services/delete/*', function(req, res) {
+		console.log("deleting service: " +req.params[0]);
+		
+		datastore.removeRoute(req.params[0], function(err, data) {
+				if (err != undefined ) {
+					res.writeHead(500, { 'Content-Type': 'application/json' });
+					res.write(JSON.stringify(err));
+					res.end();
+				}
+				else {
+					res.writeHead(200, { 'Content-Type': 'application/json' });
+					res.write(JSON.stringify(data));
+					res.end();		
+				}	
+			});
+	});
+	
+	app.get('/jigsaw/disable/*', function(req, res) {
+	
+		datastore.setStatus("stopped", req.params[0], function(err, data) {
+			if (err != undefined ) {
+				res.writeHead(500, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+			else {
+				res.writeHead(200, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(data));
+				res.end();		
+			}	
 		});
 
-		jigrequest.end();
 	});
 	
 	app.get('/jigsaw/enable/*', function(req, res) {
-		console.log("enabling service : " + req.params[0]);
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/enable/' + req.params[0],
-		  method: 'GET'
-		};
-
-		var jigrequest = http.request(options, function(jigresponse) {
-		  var data = "";
-		  jigresponse.on('data', function (chunk) {
-			data = data + chunk;
-		  });
-		  
-		  jigresponse.on('end', function (chunk) {
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.write(data);
-			res.end();
-		  });
-		  
+		
+			datastore.setStatus("started", req.params[0], function(err, data) {
+			if (err != undefined ) {
+				res.writeHead(500, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+			else {
+				res.writeHead(200, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(data));
+				res.end();		
+			}	
 		});
-
-		jigrequest.on('error', function(e) {
-		  console.log('problem with request: ' + e.message);
-		});
-
-		jigrequest.end();
+		
 	});
 	
 /* global routes - these should be last */

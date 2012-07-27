@@ -10,12 +10,12 @@ angular.module('components', [])
 			template: 
 			'<div ng-transclude ng-show="isVisible"  class="draggable shadow dialog"><h3>Add New Route</h3>'+
 			'<form>'+
-			'<span>Route:</span></br> '+
-			'<input name="route" type="text" ng-model="route.route" /></br>'+
 			'<span>Service:</span></br>'+
 			'<input name="service" type="text" ng-model="route.service" /></br>'+
 			'<span>description:</span></br>'+
 			'<textarea ng-model="route.description"></textarea></br>'+
+			'<span>Route:</span></br> '+
+			'<input name="route" type="text" ng-model="route.route" /></br>'+
 			'<span>Invocation Style :</span>'+
 			'<input type="radio" ng-model="route.invocationstyle" value="sync" />sync'+
 			'<input type="radio" ng-model="route.invocationstyle" value="async" />async'+
@@ -28,7 +28,7 @@ angular.module('components', [])
 			controller : 'emptyController',
 			compile: function(tElement, tAttrs, transclude) {
 				this.controller = 			
-					function addRouteCtrl($scope, $element, $attrs) {
+					function addRouteCtrl($scope, $element, $attrs, $resource, Route) {
 						var validate = function(route) {
 							if (empty(route)) {
 								throw new Error("The route details can't be empty");
@@ -56,7 +56,16 @@ angular.module('components', [])
 						$scope.save = function (route){
 							try {
 								if (validate(route)) {
+									// save route
+									
+									var routeResource = $resource('/jigsaw/services/add/', {isArray:true});
+									
+									var newRoute = new routeResource(route);
+									newRoute.custommiddleware = [];
+									newRoute.serviceStatus = "stopped";
+									newRoute.$save();
 									$scope.toggleDisplay();
+									$scope.routes.push(newRoute);
 									return;
 								}
 							}

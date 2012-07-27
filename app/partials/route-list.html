@@ -23,6 +23,7 @@
 
       <ul class="routes">
         <li ng-repeat="route in routes | filter:query | orderBy:orderProp" class="thumbnail">
+			<a ng-click="deleteService(route)" class="serviceToggle">Delete</a>
 			<img ng-src="img/management/{{route.serviceStatus}}.jpg" ng-click="toogleService(route)" class="serviceToggle">
 			<a href="#/routes/disable{{route.route}}">{{route.service}}</a>  
 			<p>Jigsaw Service "{{route.service}}" accessed on {{route.route}}</p>

@@ -1,0 +1,33 @@
+<script>
+	$(function() {
+		$( "#sortable" ).sortable({
+			revert: true
+		});
+		$( "#draggable" ).draggable({
+			connectToSortable: "#sortable",
+			helper: "clone",
+			revert: "invalid"
+		});
+		$( "ul, li" ).disableSelection();
+	});
+	</script>
+
+
+<div ng-controller="testCtrl" id="testpanel" class="row-fluid">
+	<div class="span5" >
+		<ul>
+			<li id="draggable" class="ui-state-highlight">New Test</li>
+		</ul>
+		<ul id="sortable">
+			<li class="ui-state-default" ng-repeat="fixture in fixtures">
+				<a class="testHeader" ng-href="{{fixture.url}}">{{fixture.desc}}</a>
+			</li>		
+		</ul>
+	</div>
+	<div class="span5">
+		<label for="desc">Service:</label><input id="desc" type="text" value="xxx">
+		<label for="desc">Desc:</label><textarea id="desc" type="text"></textarea>
+		<label for="desc">Route:</label><input id="route" type="route" value="/test/docs/example1">
+		
+	</div>
+</div>

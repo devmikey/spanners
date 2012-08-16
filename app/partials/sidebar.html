@@ -1,0 +1,78 @@
+<div class="sidebar-nav navoptions mainmenu">
+	<a href="#">Spanners</a>
+	<select id="domainPicker" ng-controller="domainCtrl" class="input-medium" ng-model="domain" ng-change="domainChanged(domain)" ng-options="d.name for d in domains">
+	</select>
+	
+	<div ng-controller="sideBarCtrl" class="accordion" id="mainmenu">	
+		<div class="accordion-group">
+			<div id="domainHeader" class="accordion-heading">
+				<a class="accordion-toggle" ng-click="toggleMenu('#domainHeader')" data-toggle="collapse" data-parent="#mainmenu" href="#domainMenu">
+					Domains
+				</a>
+			</div>
+			<div id="domainMenu" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<a href="/domains"><i class="icon-wrench"></i> New</a>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-group">
+			<div id="routeHeader" class="accordion-heading active">
+				<a class="accordion-toggle"  ng-click="toggleMenu('#routeHeader')"  data-toggle="collapse" data-parent="#mainmenu" href="#routeMenu">
+					Routes
+				</a>
+			</div>
+			<div id="routeMenu" class="accordion-body collapse in">
+				<div class="accordion-inner">
+					<a href="/routes"><span class="item"><i class="icon-wrench"></i> View</span></a>
+					<a id="newRouteBtn" data-toggle="collapse" data-target="#routeOptions"><span class="item"><i class="icon-plus-sign"></i> New</span></a>
+					<a id="exportRoutesBtn" ng-click="toggleDisplay()"><span class="item"><i class="icon-download"></i> Export</span></a>
+					<a id="importRoutesBtn" ng-click="toggleDisplay()"><span class="item"><i class="icon-upload"></i> Import</span></a>
+					<div id="search">
+						<input id="searchRoutes" class="input-medium" placeholder="Search" ng-change="orderChanged()" ng-model="query"></br></br>
+						<select id="orderRoutes" class="input-medium" ng-model="orderProp" ng-change="orderChanged(this.orderProp)">
+							<option value="serviceStatus">Status</option>
+							<option value="service">Service</option>
+						</select>
+					</div>							  
+				</div>
+			</div>
+		</div>
+		<div class="accordion-group">
+			<div id="graphHeader" class="accordion-heading">
+				<a class="accordion-toggle" ng-click="toggleMenu('#graphHeader')"  data-toggle="collapse" data-parent="#mainmenu" href="#graphMenu">
+					Graphs
+				</a>
+			</div>
+			<div id="graphMenu" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<a id="graphingTools" href="/graphs"><span class="item"><i class="icon-signal"></i> Graphs</span></a>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-group">
+			<div id="logHeader" class="accordion-heading">
+				<a class="accordion-toggle" ng-click="toggleMenu('#logHeader')" data-toggle="collapse" data-parent="#mainmenu" href="#logMenu">
+					Logs
+				</a>
+			</div>
+			<div id="logMenu" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<a id="loggingTools" href="/logs"><span class="item"><i class="icon-book"></i> Logs</span></a>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-group">
+			<div id="helpHeader" class="accordion-heading">
+				<a class="accordion-toggle" ng-click="toggleMenu('#helpHeader')" data-toggle="collapse" data-parent="#mainmenu" href="#helpMenu">
+					Help
+				</a>
+			</div>
+			<div id="helpMenu" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<a href="/helpconfiguration"><span class="item"><i class="icon-book"></i> Configuration</span></a>
+				</div>
+			</div>
+		</div>
+	  </div>
+</div>

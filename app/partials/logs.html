@@ -1,0 +1,22 @@
+<div class="row-fluid">
+	<div class="span2">
+		<ul id="myTab" class="nav nav-tabs nav-stacked" style="position: fixed">
+			<li><a data-target="#logs" data-toggle="tab"><i class="icon-heart"></i>
+			Server Status</a></li>
+			<li><a data-target="#messages" data-toggle="tab"><i class="icon-envelope"></i>
+			Message Logs</a></li>
+			<li><a data-target="#settings" data-toggle="tab"><i class="icon-cog"></i>
+			Configuration Logs</a></li>
+		</ul>
+	</div>
+	<div class="span9 tab-content">
+		<div class="tab-pane fade fade in active" id="logs">
+			<pre>Jigsaw Server : {{jigsaw}}</pre>
+			<pre>Spanners Server : {{spanners}}</pre>
+		</div>
+		<div class="tab-pane fade" id="messages"><pre>ITK Events: {{itkevents}}</pre></div>
+		<div class="tab-pane fade" id="settings"><pre>Settings : {{jigsawsettings}}</pre></div>
+	</div>
+</div>
+
+

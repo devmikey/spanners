@@ -1,26 +1,68 @@
 /* app css stylesheet */
 
-.menu li {
-  list-style: none;
+html, body {
+	padding:0px;
+	margin:0px;
 }
 
-.routes {
-  list-style: none;
+.sidebar-nav {
+	position: fixed;
+	left: 0;
+	width: 224px;
+	height: 100%;
+	border: solid 2px black;
+	padding: 0;
+	z-index: 10;
 }
 
-.serviceToggle {
-  float: left;
-  padding: 0.5em;
-  padding: 0.5em;
-  padding-bottom: 5em;
+.maincontent {
+	border: solid 1px red;
+	margin-left:230px;
+	min-width: 1010px;
 }
 
-.routes li {
-  clear: both;
-  height: 7em;
-  padding-top: 15px;
+.optionsbar {
+	position: fixed;
+	left:230px;
+	bottom:0px;
+	width:100%;
+	z-index: 10;
+	background: white;
+	border: solid 1px black;
 }
 
-h1 {
-  border-bottom: 1px solid gray;
+.accordion-heading {
+	background-image: url('../img/site/menu_button.png');
+}
+
+.accordion-heading.active {
+	color: red;
+	background-position: 223px;
+}
+
+.accordion-inner  {
+	padding:0;
+}
+
+.accordion-inner a {
+	display: block;
+	height: 43px;
+	padding-top: 3px;
+	padding-left: 20px;
+	cursor: pointer;
+}
+
+
+#domainPicker {
+	margin: 10px;
+}
+
+#search {
+	padding: 10px;
+}
+
+#messageGraph {
+	min-width: 400px; 
+	height: 400px; 
+	margin: 0 auto;
 }

@@ -4,16 +4,21 @@
 * include any modules you will use through out the file
 **/
 
+var childProcess = require('child_process');
 var express = require('express');
 var connect = require('connect');
-var http = require('http');
 var winstond = require('winstond');
 var iologger = require('./lib/winston-socketio.js');
-
+var datastore = require('./lib/datastore.js');
 // socket.io  needs to be configured like below - see https://github.com/LearnBoost/socket.io/issues/785
 var app = express();
 var server = app.listen(4000);
 var io = require('socket.io').listen(server);
+
+var settingsFile = "c:/users/devmikey/documents/github/spanners/config/settings.json";
+var pluginFile = "c:/users/devmikey/documents/github/jigsaw/config/plugins.json";
+var publicKey = "C:/Users/devmikey/Documents/GitHub/Jigsaw/certs-server/server_public.pem";
+
 
 var winstondserver = winstond.nssocket.createServer({
   services: ['collect', 'query', 'stream'],
@@ -23,12 +28,40 @@ var winstondserver = winstond.nssocket.createServer({
 winstondserver.add(iologger.SocketIOLogger, {"io": io});
 winstondserver.listen();
 
+var jigsawServers = new Array();
+
 var report = io.sockets.on('connection', function (socket) {
   socket.emit('spanners', { 'message': 'socket connected' });
     socket.on('clientquery', function (data) {
 		console.log(data);
   });
 });
+
+// move this into a module
+var startJigsaw = function(){	
+	/* move all of this configuration into the spanners configuration db */
+	datastore.loadSettings(settingsFile, function(err, settingsdata ) {
+		var settings = JSON.parse(settingsdata);
+		if (err) {
+			throw new Error(err);			
+		}
+		datastore.loadSettings(pluginFile, function(err, plugins) {
+			
+			if (err) {
+				throw new Error(err);
+			}
+			// for each instance of a server
+			for (var domains =0; domains < settings.length; domains++) {
+				jigsawServers.push(childProcess.fork('../jigsaw/server',[JSON.stringify(settings[domains]), plugins, publicKey]));
+				
+				jigsawServers[jigsawServers.length-1].on('exit', function (code, signal) {
+				  console.log('child process terminated due to receipt of signal '+signal +' code ' +code);
+				});
+				
+			}
+		})
+	})
+}
 
 
 /**
@@ -59,65 +92,66 @@ app.configure('production', function() {
 * dynamic route loaders
 **/
 	// get jigsaw service information
-	app.get('/jigsaw/services', function(req, res) {
-		// load from file instead of jigsaw
-
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/services',
-		  method: 'GET'
-		};
+	app.get('/jigsaw/servicelist/*', function(req, res) {
+		var app = req.app;
+		var domain = req.params[0];
+		app.domain = domain;
 		
-		invokejigsaw(null, options, function(err, data) {
-			if (err != undefined ) {
+		datastore.loadSettings(settingsFile, function(err, data) {
+			if (err != undefined) {
 				res.writeHead(500, { 'Content-Type': 'application/json' });
 				res.write(JSON.stringify(err));
 				res.end();
 			}
-			else {
-				//restart(req,res);
-				res.writeHead(200, { 'Content-Type': 'application/json' });
-				res.write(data);
-				res.end();
-			}	
-		});
+			
+			var domainIdx;
+			var settings = JSON.parse(data);
+			
+			for (var dom = 0; dom < settings.length; dom ++) {
+				if (settings[dom].name == domain) {
+					 domainIdx = dom;
+				}
+			}		
+			
+			if (domainIdx == undefined)	{
+				return callback(new Error("Unknown domain : " + domain));
+			}
+			
+			app.routes = settings[domainIdx].routes;
+			res.writeHead(200, { 'Content-Type': 'application/json' });
+			res.write(JSON.stringify(app.routes));
+			res.end();		
+		})	
 	});
 	
-var restart = function(req, res) {
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/restart',
-		  method: 'GET'
-		};
-
-		var jigrequest = http.request(options, function(jigresponse) {
-		  var data = "";
-		  jigresponse.on('data', function (chunk) {
-			data = data + chunk;
-		  });
-
-		  jigresponse.on('end', function (chunk) {
+	// list of domains
+	app.get('/jigsaw/domains', function(req, res) {
+		
+		datastore.loadSettings(settingsFile, function(err, data) {
+			if (err != undefined) {
+				res.writeHead(500, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+			
+			var settings = JSON.parse(data);
+			var domains = new Array();
+			for (var dom = 0; dom < settings.length; dom ++) {
+				domains.push({"name" : settings[dom].name});
+			}		
+		
 			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.write(data);
-			res.end();
-		  });
-
-		});
-
-		jigrequest.on('error', function(e) {
-		  console.log('problem with request: ' + e.message);
-		});
-
-		jigrequest.end();
-
-	};
+			res.write(JSON.stringify(domains));
+			res.end();		
+		})	
+	});
 	
-	app.post('/jigsaw/services/add', function(req, res) {
+	app.post('/jigsaw/services/route/new', function(req, res) {
 		// need to validate first
 		// post onto the appropriate jigsaw server
 		// return a valid response
+		var app = req.app;
+		var domain = app.domain;
 		var data = "";
 		
 		req.on('data', function (chunk) {
@@ -125,14 +159,7 @@ var restart = function(req, res) {
 		});
 
 		req.on('end', function (chunk) {
-			// add the settings
-			var options = {
-			  host: 'localhost',
-			  port: 3000,
-			  path: '/jigsaw/services/add',
-			  method: 'POST'
-			};
-			invokejigsaw(data, options, function(err, data) {
+			datastore.addRoute(data, domain, settingsFile, function(err, data) {
 				if (err != undefined ) {
 					res.writeHead(500, { 'Content-Type': 'application/json' });
 					res.write(JSON.stringify(err));
@@ -140,107 +167,82 @@ var restart = function(req, res) {
 				}
 				else {
 					//restart(req,res);
+					data.settingdescription = "added";
 					res.writeHead(200, { 'Content-Type': 'application/json' });
-					res.write(data);
-					res.end();
+					res.write(JSON.stringify(data));
+					res.end();		
 				}	
 			});
-		});
-	});
-	
-	
-	function invokejigsaw(postdata, options, callback) {
-		var jigrequest = http.request(options, function(jigresponse) {
-		  var data = "";
-		  jigresponse.on('data', function (chunk) {
-			data = data + chunk;
-		  });
-		  jigresponse.on('end', function (chunk) {
-			return callback(null, data)
-		  });
-
-		});
-		
-		jigrequest.on('error', function(e) {
-		  return callback(new Error('problem with request: ' + e.message));
-		});
-		if (postdata != null) {
-			jigrequest.write(postdata);
-		}
-		jigrequest.end();
-	}
-	
-	app.get('/jigsaw/services/delete/*', function(req, res) {
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/services/delete/'+req.params[0],
-		  method: 'GET'
-		};
-		
-		invokejigsaw(null, options, function(err, data) {
-			if (err != undefined ) {
-				res.writeHead(500, { 'Content-Type': 'application/json' });
-				res.write(JSON.stringify(err));
-				res.end();
-			}
-			else {
-				//restart(req,res);
-				res.writeHead(200, { 'Content-Type': 'application/json' });
-				res.write(data);
-				res.end();
-			}	
-		});	
 			
+		});
 	});
-	
-	app.get('/jigsaw/services/disable/*', function(req, res) {
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/services/disable/'+req.params[0],
-		  method: 'GET'
-		};
+
+	app.get('/jigsaw/services/route/delete/*', function(req, res) {
+		var app = req.app;
+		var domain = app.domain;
 		
-		invokejigsaw(null, options, function(err, data) {
+		datastore.removeRoute(req.params[0], domain, settingsFile,  function(err, data) {
 			if (err != undefined ) {
 				res.writeHead(500, { 'Content-Type': 'application/json' });
 				res.write(JSON.stringify(err));
 				res.end();
 			}
 			else {
-				//restart(req,res);
+				data.settingdescription = "deleted";
 				res.writeHead(200, { 'Content-Type': 'application/json' });
-				res.write(data);
-				res.end();
+				res.write(JSON.stringify(data));
+				res.end();		
 			}	
-		});	
+		});
+			
+	});	
+	
+	app.get('/jigsaw/services/route/disable/*', function(req, res) {
+		// need to pass in domain from client
+		datastore.setStatus("stopped", app.domain, req.params[0], settingsFile, function(err, data) {
+			if (err != undefined ) {
+				res.writeHead(500, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+			else {
+				data.settingdescription = "disabled";
+				app.routes = data;
+				res.writeHead(200, { 'Content-Type': 'application/json' });
+				res.write(JSON.stringify(data));
+				res.end();		
+			}	
+		});
+		
+		// just need to tell jigsaw to reload services now
 
 	});
 	
-	app.get('/jigsaw/services/enable/*', function(req, res) {
-		var options = {
-		  host: 'localhost',
-		  port: 3000,
-		  path: '/jigsaw/services/enable/'+req.params[0],
-		  method: 'GET'
-		};
-		
-		invokejigsaw(null, options, function(err, data) {
+	app.get('/jigsaw/services/route/enable/*', function(req, res) {
+		// need to pass in domain from client
+		datastore.setStatus("started", app.domain, req.params[0], settingsFile, function(err, data) {
 			if (err != undefined ) {
 				res.writeHead(500, { 'Content-Type': 'application/json' });
 				res.write(JSON.stringify(err));
 				res.end();
 			}
 			else {
-				//restart(req,res);
+				data.settingdescription = "disabled";
+				app.routes = data;
 				res.writeHead(200, { 'Content-Type': 'application/json' });
-				res.write(data);
-				res.end();
+				res.write(JSON.stringify(data));
+				res.end();		
 			}	
-		});	
+		});
+		
+		// just need to tell jigsaw to reload services now
 		
 	});
+
+	// home page
+app.get('/', function(req, res) {
+	res.redirect('/routes');
+});
 
 /* global routes - these should be last */
 app.get('/403', function(req, res) {
@@ -257,10 +259,7 @@ app.get('/*', function(req, res) {
 	throw new Error("Not Found: " + req.url);
 });
 
-// home page
-app.get('/', function(req, res) {
-	res.render('index', { title: 'Pipecleaning Page ' })
-});
+startJigsaw();
 
 console.log("spanners is running on http://localhost:4000/");
 

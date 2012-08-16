@@ -1,36 +1,37 @@
 <!doctype html>
 <html lang="en" ng-app="routelist">
-<head>
-  <meta charset="utf-8">
-  <title>Spanners</title>
-  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css">
-  <link rel="stylesheet" href="css/app.css">
-  
-  	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
-  
-  <style type="text/css">
-        body {
-            padding-top: 50px;
-        }
-    </style>
-  
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+	<head>
+		<meta charset="utf-8">
+		<title>Spanners</title>
+		<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.css">
+		<link rel="stylesheet" href="css/pageguide.css">
+		<link rel="stylesheet" href="css/app.css">
+		<script type="text/javascript" src="lib/jquery/jquery-1.7.2.min.js"></script>
+		
+		<script src="/socket.io/socket.io.js"></script>
+		
+		<script src="lib/angular/angular.js"></script>
+		<script src="js/app.js"></script>
+		<script src="js/directives.js"></script>
+		<script src="js/controllers.js"></script>
+		<script src="js/filters.js"></script>
+		<script src="js/services.js"></script>
+		<script src="lib/angular/angular-resource.js"></script>
+	</head>
+	<body>
 
-  
-  <script src="lib/angular/angular.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/directives.js"></script>
-  <script src="js/controllers.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/services.js"></script>
-  <script src="lib/angular/angular-resource.js"></script>
-  
-</head>
-<body>
-  <div ng-view></div>
-</body>
-	<script src="lib/bootstrap/js/bootstrap.js"></script>
+		<div ng-include src="'partials/sidebar.html'"></div>
+		
+		<div class="maincontent">
+			<div ng-view></div>
+		</div>
+		
+		<div class="optionsbar" ng-include src="'partials/optionsbar.html'"></div>
+		
+		<script src="lib/bootstrap/js/bootstrap.js"></script>
+		<!-- <script src="http://code.highcharts.com/highcharts.js"></script> -->
+		<script src="lib/pageguide/pageguide.js"></script>
+		
+	</body>
+	
 </html>

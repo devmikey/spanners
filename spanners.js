@@ -52,7 +52,9 @@ var startJigsaw = function(){
 			}
 			// for each instance of a server
 			for (var domains =0; domains < settings.length; domains++) {
-				jigsawServers.push(childProcess.fork('../jigsaw/server',[JSON.stringify(settings[domains]), plugins, publicKey]));
+				console.log("starting node server " + [JSON.stringify(settings[domains])] + " " + plugins + " " +publicKey);
+				var routeConfig = JSON.stringify(settings[domains]);
+				jigsawServers.push(childProcess.fork('../jigsaw/server',[routeConfig, plugins, publicKey]));
 				
 				jigsawServers[jigsawServers.length-1].on('exit', function (code, signal) {
 				  console.log('child process terminated due to receipt of signal '+signal +' code ' +code);
@@ -144,6 +146,30 @@ app.configure('production', function() {
 			res.write(JSON.stringify(domains));
 			res.end();		
 		})	
+	});
+	
+	app.post('/jigsaw/services/domain/new', function(req, res) {
+		var data = "";
+		
+		req.on('data', function (chunk) {
+			data = data + chunk;
+		});
+
+		req.on('end', function (chunk) {
+			datastore.addDomain(data, settingsFile, function(err) {
+				if (err != undefined ) {
+					res.writeHead(500, { 'Content-Type': 'application/json' });
+					res.write(JSON.stringify(err));
+					res.end();
+				}
+				else {
+					res.writeHead(200, { 'Content-Type': 'application/json' });
+					res.write(data);
+					res.end();		
+				}	
+			});
+			
+		});
 	});
 	
 	app.post('/jigsaw/services/route/new', function(req, res) {

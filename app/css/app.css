@@ -1,8 +1,8 @@
 /* app css stylesheet */
 
 html, body {
-	padding:0px;
-	margin:0px;
+	padding: 0;
+	margin: 0;
 }
 
 .sidebar-nav {
@@ -17,48 +17,73 @@ html, body {
 
 .maincontent {
 	border: solid 1px red;
-	margin-left:230px;
+	margin-left: 230px;
 	min-width: 1010px;
 }
 
 .optionsbar {
 	position: fixed;
-	left:230px;
-	bottom:0px;
-	width:100%;
+	left: 230px;
+	bottom: 0;
+	width: 100%;
 	z-index: 10;
 	background: white;
 	border: solid 1px black;
 }
 
+.accordion-group {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.accordion-group a {
+	color: inherit;
+	text-decoration:none;
+}
+
 .accordion-heading {
+	color: #888;
 	background-image: url('../img/site/menu_button.png');
+	height: 43px;
+}
+
+.accordion-heading:hover {
+	background-position: 446px;	
 }
 
 .accordion-heading.active {
-	color: red;
+	color: white;
+	font-weight: bold;
 	background-position: 223px;
+	border-top: solid 1px white;
+	border-bottom: solid 1px black;
 }
 
-.accordion-inner  {
-	padding:0;
+.accordion-heading.active a{
+	color: inherit;
+}
+
+
+.accordion-inner {
 }
 
 .accordion-inner a {
 	display: block;
-	height: 43px;
-	padding-top: 3px;
-	padding-left: 20px;
-	cursor: pointer;
+	padding: 5px;
 }
 
-
-#domainPicker {
-	margin: 10px;
+.accordion-inner a i{
+	margin-left: 9px;
 }
+
 
 #search {
-	padding: 10px;
+	padding: 5px;
+}
+#domainPicker {
+	display: block;
+	margin: 20px;
 }
 
 #messageGraph {

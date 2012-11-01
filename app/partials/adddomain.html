@@ -3,12 +3,10 @@
 	<form class="form-horizontal">
 		<label>Name:</label>
 		<input name="name" type="text" ng-model="domain.name" />
-		<label>description:</label>
-		<textarea ng-model="domain.description"></textarea></br>
 		<label>Port:</label>
 		<input name="port" type="text" ng-model="domain.port" />
-		<a ng-click="cancel()" class="btn">Cancel</a>
-		<a ng-click="save(route)" class="btn btn-primary">Save</a>
+		<a ng-click="clear()" class="btn">Clear</a>
+		<a ng-click="save(domain)" class="btn btn-primary">Save</a>
 	</form>
 	<p>{{message}}</p>
 </div>

@@ -26,21 +26,27 @@ function sideBarCtrl($scope, toolEvent) {
 	$scope.displayScreen = function() {
 	}
 	
+	$scope.queryChanged = function() {
+		 toolEvent.prepForBroadcast('queryChanged', $scope.query); 
+	}
+	
+	$scope.orderChanged = function(order) {
+	  toolEvent.prepForBroadcast('orderChanged', order); 
+	}	  
+	
 	$scope.toggleMenu = function(element) {	
 		$('.accordion-heading').removeClass("active");
 		$(element).addClass("active");
 	}
 
-	$scope.orderChanged = function(order) {
-	  toolEvent.prepForBroadcast('orderChanged', order); 
-	}	  
+	
 }
 
 // domain controllers
 
 function domainCtrl($scope, Domains, toolEvent) {
-	$scope.domains = [{"name":"development"},{"name":"test"}];
-	$scope.domain = $scope.domains[0];
+	$scope.domains = Domains.query();
+	//$scope.domain = $scope.domains[0];
 	$scope.domainChanged = function(domain) {
 		toolEvent.prepForBroadcast('domainChanged', domain.name); 
 	}
@@ -49,8 +55,8 @@ function domainCtrl($scope, Domains, toolEvent) {
     }); 
 }
 
-function addDomainCtrl($scope, toolEvent) {
-	$scope.cancel = function () {
+function addDomainCtrl($scope, $resource, toolEvent) {
+	$scope.clear = function () {
 		// clear settings
 	}
 	
@@ -59,10 +65,10 @@ function addDomainCtrl($scope, toolEvent) {
 			if (validateDomain(domain)) {
 				// save route
 				
-				var domainResource = $resource('/jigsaw/domain/add/', {
+				var domainResource = $resource('/jigsaw/services/domain/new/', {
 						isArray : true
 					});
-				
+				domain.routes = new Array();
 				var newDomain = new domainResource(domain);
 				newDomain.$save();
 				toolEvent.prepForBroadcast('newDomain', newDomain); 
@@ -87,7 +93,11 @@ function RouteListCtrl($scope, $http, Route, toolEvent) {
 	
 	$scope.$on('orderChanged', function() {
         $scope.orderProp = toolEvent.message;
-    });   
+    });  
+
+	$scope.$on('queryChanged', function() {
+        $scope.query = toolEvent.message;
+    });  	
 
 	$scope.$on('newRoute', function() {
         $scope.routes.push(toolEvent.message);
